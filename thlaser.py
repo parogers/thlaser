@@ -83,7 +83,7 @@ import re
 import copy
 import sys
 import time
-_ = inkex._
+from gettext import gettext as _
 
 
 ################################################################################
@@ -808,7 +808,12 @@ class Gcode_tools(inkex.Effect):
         selected = self.selected.values()
 
         root = self.document.getroot()
-        self.pageHeight = float(root.get("height", None))
+        # In version update from 0.48 to 0.91, unit conversions changed.
+        # Attempt the 0.91 approach and, if that fails, try the 0.48 approach.
+        try:
+            self.pageHeight = float(self.unittouu(root.get("height", None)))
+        except AttributeError:
+            self.pageHeight = float(inkex.unittouu(root.get("height", None)))
         self.flipArcs = (self.options.Xscale*self.options.Yscale < 0)
         self.currentTool = 0
 
